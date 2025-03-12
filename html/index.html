@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ata Talk To Npc</title>
+    <link rel="stylesheet" href="app.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+    <script src="./app.js" defer></script>
+</head>
+<body>
+    <div id="app" class="w-full bg-transparent h-screen flex p-10 relative gap-20" v-if="display">
+        <div class="flex flex-col w-[38%]">
+            <span class="text-1xl text-white font-light">NPC</span>
+            <h1 class="text-4xl text-white font-bold">
+                {{ name }}
+            </h1>
+            <div class="flex flex-col gap-4 mt-10 items-start w-full overflow-y-scroll no-scrollbar" id="chat-history">
+                <div v-for="(item, i) in chatHistory" :key="i" class="flex flex-col items-start w-full">
+                    <p v-if="item.type == 'text'" :class="{'question-text': item.left, 'answer-text': !item.left}">
+                        <span>{{ item.data }}</span>
+                        <div v-if="isTyping && i === chatHistory.length - 1" class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </p>
+                    <div v-if="item.type == 'buy'" class="flex flex-col gap-3 w-full animate-slideIn">
+                        <div class="flex self-end gap-1 items-center">
+                            <span class="font-1xl font-medium text-orange-1">Buy Item</span>
+                            <div class="size-[2.5vw] bg-orange-1 rounded-full flex justify-center items-center shadow-2xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M6.1322 0L2.4202 6.496H1.0002C0.846433 6.49597 0.694727 6.5314 0.556878 6.59954C0.419028 6.66768 0.29875 6.76669 0.205392 6.88888C0.112034 7.01106 0.0481128 7.15314 0.018596 7.30405C-0.0109208 7.45496 -0.00523743 7.61064 0.0352042 7.759L2.8342 18.022C2.95022 18.4451 3.20186 18.8184 3.5505 19.0846C3.89914 19.3509 4.32552 19.4954 4.7642 19.496H15.2372C16.1352 19.496 16.9292 18.891 17.1672 18.021L19.9662 7.758C20.0069 7.6096 20.0127 7.4538 19.9833 7.30277C19.9538 7.15174 19.8898 7.00958 19.7962 6.88739C19.7027 6.76519 19.5822 6.66629 19.4441 6.59839C19.306 6.5305 19.1541 6.49545 19.0002 6.496H17.5802L13.8682 0L12.1322 0.992L15.2772 6.496H4.7232L7.8682 0.992L6.1322 0ZM12.0002 10.496H14.0002V15.496H12.0002V10.496ZM6.0002 10.496H8.0002V15.496H6.0002V10.496Z" fill="#4B2E10"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div class="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar max-h-[27vw]">
+                                <div class="item" v-for="(childitem, index) in item.data">
+                                    <span class="item-badge clip-path">${{ childitem.price }}</span>
+                                    <img :src="'./images/'+childitem.name+'.png'" alt="" class="w-[6vw] h-auto mt-9" @error="iconChange($event)">
+                                    <span class="text-white text-[1.05vw] font-medium">{{ childitem.label }}</span>
+                                    <div class="flex w-[7.5vw] h-[2.5vw] bg-card-bg rounded-full items-center justify-center text-white font-bold relative mt-[0.5vw]">
+                                        <div @click="minusHandler(i , index)" class="size-[2.5vw] rounded-full bg-card-bg flex justify-center items-center absolute left-0 top-0 font-[2vw] cursor-pointer hover:bg-opacity-75">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                                <path d="M18 13.498H6C5.73478 13.498 5.48043 13.3926 5.29289 13.2051C5.10536 13.0176 5 12.7632 5 12.498C5 12.2328 5.10536 11.9784 5.29289 11.7909C5.48043 11.6033 5.73478 11.498 6 11.498H18C18.2652 11.498 18.5196 11.6033 18.7071 11.7909C18.8946 11.9784 19 12.2328 19 12.498C19 12.7632 18.8946 13.0176 18.7071 13.2051C18.5196 13.3926 18.2652 13.498 18 13.498Z" fill="#E6E6E6"/>
+                                            </svg>
+                                        </div>
+                                        {{ childitem.count }}
+                                        <div @click="plusHandler(i, index, childitem.max)" class="size-[2.5vw] rounded-full bg-card-bg flex justify-center items-center absolute right-0 top-0 font-[2vw] cursor-pointer hover:bg-opacity-75">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                                <path d="M12 19.5V5.5M19 12.5H5" stroke="#E6E6E6" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-4 w-full">
+                                <div class="flex items-center w-full gap-2 justify-between">
+                                    <span class="text-text-2 font-1xl font-medium text-1xl">Total Price</span>
+                                    <svg class="w-auto" width="356" height="1" viewBox="0 0 406 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <line y1="0.5" x2="406" y2="0.5" stroke="white" stroke-opacity="0.3" stroke-dasharray="2 2"/>
+                                    </svg>
+                                    <span class="font-bold text-green-2 bg-green-1 rounded-full p-2 py-1 text-[1.05vw] min-w-[5vw] text-center">${{ new Intl.NumberFormat('en-US').format(totalPrice) }}</span>
+                                </div>
+                                <svg width="100%" height="2" viewBox="0 0 643 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 1C0 0.447715 0.447715 0 1 0H642C642.552 0 643 0.447715 643 1C643 1.55228 642.552 2 642 2H0.999996C0.447712 2 0 1.55228 0 1Z" fill="white" fill-opacity="0.09"/>
+                                </svg>
+                                <div class="flex items-center w-full gap-2 justify-between">
+                                    <span class="text-text-2 font-1xl font-medium text-1xl">How To Pay</span>
+                                    <svg class="w-auto" width="300" height="1" viewBox="0 0 406 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <line y1="0.5" x2="406" y2="0.5" stroke="white" stroke-opacity="0.3" stroke-dasharray="2 2"/>
+                                    </svg>
+                                    <button class="rounded-full bg-white text-black font-medium shadow-lg p-2 text-[0.85vw] cursor-pointer" @click="buyBank()">Bank Account</button>
+                                    <button class="rounded-full bg-white text-black font-medium shadow-lg p-2 text-[0.85vw] cursor-pointer" @click="buyCash()">Cash Money</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="item.type == 'sell'" class="flex flex-col gap-3 w-full animate-slideIn">
+                        <div class="flex self-start gap-1 items-center">
+                            <div class="size-[2.5vw] bg-white rounded-full flex justify-center items-center shadow-2xl font-bold">sell</div>
+                            <span class="font-1xl font-medium text-white">Sell Item</span>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div class="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar max-h-[27vw]">
+                                <div class="item" v-for="(childitem, index) in item.data">
+                                    <span class="sell-badge clip-path">${{ childitem.price }}</span>
+                                    <img :src="'./images/'+childitem.name+'.png'" alt="" class="w-[6vw] h-auto mt-9" @error="iconChange($event)">
+                                    <span class="text-white text-[1.05vw] font-medium">{{ childitem.label }}</span>
+                                    <div class="flex w-[7.5vw] h-[2.5vw] bg-card-bg rounded-full items-center justify-center text-white font-bold relative mt-[0.5vw]">
+                                        <div @click="minusHandler(i , index)" class="size-[2.5vw] rounded-full bg-card-bg flex justify-center items-center absolute left-0 top-0 font-[2vw] cursor-pointer hover:bg-opacity-75">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                                <path d="M18 13.498H6C5.73478 13.498 5.48043 13.3926 5.29289 13.2051C5.10536 13.0176 5 12.7632 5 12.498C5 12.2328 5.10536 11.9784 5.29289 11.7909C5.48043 11.6033 5.73478 11.498 6 11.498H18C18.2652 11.498 18.5196 11.6033 18.7071 11.7909C18.8946 11.9784 19 12.2328 19 12.498C19 12.7632 18.8946 13.0176 18.7071 13.2051C18.5196 13.3926 18.2652 13.498 18 13.498Z" fill="#E6E6E6"/>
+                                            </svg>
+                                        </div>
+                                        {{ childitem.count }}
+                                        <div @click="plusHandler(i, index, childitem.max)" class="size-[2.5vw] rounded-full bg-card-bg flex justify-center items-center absolute right-0 top-0 font-[2vw] cursor-pointer hover:bg-opacity-75">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                                <path d="M12 19.5V5.5M19 12.5H5" stroke="#E6E6E6" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-4 w-full">
+                                <div class="flex items-center w-full gap-2 justify-between">
+                                    <span class="text-text-2 font-1xl font-medium text-1xl">Total Price</span>
+                                    <svg class="w-auto" width="356" height="1" viewBox="0 0 406 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <line y1="0.5" x2="406" y2="0.5" stroke="white" stroke-opacity="0.3" stroke-dasharray="2 2"/>
+                                    </svg>
+                                    <span class="font-bold text-green-2 bg-green-1 rounded-full p-2 py-1 text-[1.05vw] min-w-[5vw] text-center">${{ new Intl.NumberFormat('en-US').format(totalPrice) }}</span>
+                                </div>
+                                <svg width="100%" height="2" viewBox="0 0 643 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 1C0 0.447715 0.447715 0 1 0H642C642.552 0 643 0.447715 643 1C643 1.55228 642.552 2 642 2H0.999996C0.447712 2 0 1.55228 0 1Z" fill="white" fill-opacity="0.09"/>
+                                </svg>
+                                <div class="flex items-center w-full gap-2 justify-between">
+                                    <span class="text-text-2 font-1xl font-medium text-1xl">How To Pay</span>
+                                    <svg class="w-auto" width="300" height="1" viewBox="0 0 406 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <line y1="0.5" x2="406" y2="0.5" stroke="white" stroke-opacity="0.3" stroke-dasharray="2 2"/>
+                                    </svg>
+                                    <button class="rounded-full bg-white text-black font-medium shadow-lg p-2 text-[0.85vw] cursor-pointer" @click="sellBank()">Bank Account</button>
+                                    <button class="rounded-full bg-white text-black font-medium shadow-lg p-2 text-[0.85vw] cursor-pointer" @click="sellCash()">Cash Money</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-[2vw] w-full items-end mt-[2vw] animate-slideIn" v-if="item.type == 'remove'">
+                        <div class="flex items-center gap-[0.5vw]">
+                            <span class="text-red-text text-[1vw] font-semibold drop-shadow-lg">Item Removed</span>
+                            <div class="rounded-full bg-red-text w-[2.5vw] h-[2.5vw] flex items-center justify-center shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M10.5 20C10.5 20.3978 10.658 20.7794 10.9393 21.0607C11.2206 21.342 11.6022 21.5 12 21.5C12.3978 21.5 12.7794 21.342 13.0607 21.0607C13.342 20.7794 13.5 20.3978 13.5 20V13.5H20C20.3978 13.5 20.7794 13.342 21.0607 13.0607C21.342 12.7794 21.5 12.3978 21.5 12C21.5 11.6022 21.342 11.2206 21.0607 10.9393C20.7794 10.658 20.3978 10.5 20 10.5H13.5V4C13.5 3.60218 13.342 3.22064 13.0607 2.93934C12.7794 2.65804 12.3978 2.5 12 2.5C11.6022 2.5 11.2206 2.65804 10.9393 2.93934C10.658 3.22064 10.5 3.60218 10.5 4V10.5H4C3.60218 10.5 3.22064 10.658 2.93934 10.9393C2.65804 11.2206 2.5 11.6022 2.5 12C2.5 12.3978 2.65804 12.7794 2.93934 13.0607C3.22064 13.342 3.60218 13.5 4 13.5H10.5V20Z" fill="#2C100B"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar max-h-[27vw]">
+                            <div class="rounded-lg bg-red-card w-[10vw] h-[11vw] flex flex-col items-center" v-for="(childitem, index) in item.data">
+                                <img :src="'./images/'+childitem.name+'.png'" alt="" class="w-[6vw] h-auto mt-[1vw]" @error="iconChange($event)">
+                                <span class="text-white text-[1vw] font-light">{{ childitem.label }}</span>
+                                <span class="text-white text-[1.1vw] font-bold mt-[0.5vw]">-{{ childitem.name == 'money' ? '$' : 'x' }}{{ childitem.count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-[2vw] w-full items-end mt-[2vw] animate-slideIn" v-if="item.type == 'add'">
+                        <div class="flex items-center gap-[0.5vw]">
+                            <span class="text-green-1 text-[1vw] font-semibold drop-shadow-lg">Item Added</span>
+                            <div class="rounded-full bg-green-1 w-[2.5vw] h-[2.5vw] flex items-center justify-center shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M8.5 18C8.5 18.3978 8.65804 18.7794 8.93934 19.0607C9.22064 19.342 9.60218 19.5 10 19.5C10.3978 19.5 10.7794 19.342 11.0607 19.0607C11.342 18.7794 11.5 18.3978 11.5 18V11.5H18C18.3978 11.5 18.7794 11.342 19.0607 11.0607C19.342 10.7794 19.5 10.3978 19.5 10C19.5 9.60218 19.342 9.22064 19.0607 8.93934C18.7794 8.65804 18.3978 8.5 18 8.5H11.5V2C11.5 1.60218 11.342 1.22064 11.0607 0.93934C10.7794 0.658035 10.3978 0.5 10 0.5C9.60218 0.5 9.22064 0.658035 8.93934 0.93934C8.65804 1.22064 8.5 1.60218 8.5 2V8.5H2C1.60218 8.5 1.22064 8.65804 0.93934 8.93934C0.658035 9.22064 0.5 9.60218 0.5 10C0.5 10.3978 0.658035 10.7794 0.93934 11.0607C1.22064 11.342 1.60218 11.5 2 11.5H8.5V18Z" fill="#25450C"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar max-h-[27vw]">
+                            <div class="rounded-lg bg-green-card w-[10vw] h-[11vw] flex flex-col items-center" v-for="(childitem, index) in item.data">
+                                <img :src="'./images/'+childitem.name+'.png'" alt="" class="w-[6vw] h-auto mt-[1vw]" @error="iconChange($event)">
+                                <span class="text-white text-[1vw] font-light">{{ childitem.label }}</span>
+                                <span class="text-white text-[1.1vw] font-bold mt-[0.5vw]">{{ childitem.name == 'money' ? '$' : 'x' }}{{ childitem.count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-[2vw] w-full items-end mt-[2vw] animate-slideIn rounded-lg overflow-hidden" v-if="item.type == 'notification'" >
+                        <div class="w-full h-auto gap[0.5vw] flex flex-col"  v-for="notification in item.data">
+                            <div class="h-[3vw] success w-full flex items-center p-[0.8vw] gap-[0.5vw]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">  <path d="M12 0.5C5.37258 0.5 0 5.87258 0 12.5C0 19.1274 5.37258 24.5 12 24.5C18.6274 24.5 24 19.1274 24 12.5C24 5.87258 18.6274 0.5 12 0.5ZM17.1489 6.1206L19.6421 8.61376L11.855 16.4024L9.37646 18.8794L6.8833 16.3862L4.3579 13.8594L6.83496 11.3823L9.36036 13.9092L17.1489 6.1206Z" fill="black"/></svg>
+                                <span class="text-[1vw] font-medium">{{ notification.title }}</span>
+                            </div>
+                            <p class="w-full p-[1vw] flex items-center text-[1vw] font-medium bg-card-bg text-white">{{ notification.message }} </p>
+                            <div class="flex items-center justify-center w-full gap-[0.3vw] mt-[2vw]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="233" height="11" viewBox="0 0 233 11" fill="none"><path opacity="0.16" d="M222.167 5.5C222.167 8.44552 224.554 10.8333 227.5 10.8333C230.446 10.8333 232.833 8.44552 232.833 5.5C232.833 2.55448 230.446 0.166667 227.5 0.166667C224.554 0.166667 222.167 2.55448 222.167 5.5ZM0 6.5H227.5V4.5H0V6.5Z" fill="url(#paint0_linear_63_3280)"/><defs><linearGradient id="paint0_linear_63_3280" x1="0" y1="6" x2="227.5" y2="6" gradientUnits="userSpaceOnUse"><stop stop-color="#999999" stop-opacity="0"/><stop offset="1" stop-color="white"/></linearGradient></defs></svg>
+                                <button @click="handleNotificationClick(notification.event)" class="cursor-pointer rounded-full flex items-center justify-center gap-[0.2vw] text-white font-medium bg-card-bg py-[0.4vw] px-[0.7vw]"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="19" viewBox="0 0 20 19" fill="none">
+                                    <path d="M9.99967 9.10433C9.47477 9.10433 8.97136 8.89581 8.60019 8.52464C8.22903 8.15348 8.02051 7.65007 8.02051 7.12516C8.02051 6.60026 8.22903 6.09685 8.60019 5.72568C8.97136 5.35451 9.47477 5.146 9.99967 5.146C10.5246 5.146 11.028 5.35451 11.3992 5.72568C11.7703 6.09685 11.9788 6.60026 11.9788 7.12516C11.9788 7.38507 11.9276 7.64243 11.8282 7.88256C11.7287 8.12268 11.5829 8.34086 11.3992 8.52464C11.2154 8.70843 10.9972 8.85421 10.7571 8.95367C10.5169 9.05314 10.2596 9.10433 9.99967 9.10433ZM9.99967 1.5835C8.52993 1.5835 7.12039 2.16735 6.08112 3.20661C5.04186 4.24588 4.45801 5.65542 4.45801 7.12516C4.45801 11.2814 9.99967 17.4168 9.99967 17.4168C9.99967 17.4168 15.5413 11.2814 15.5413 7.12516C15.5413 5.65542 14.9575 4.24588 13.9182 3.20661C12.879 2.16735 11.4694 1.5835 9.99967 1.5835Z" fill="white"/>
+                                    </svg> {{ notification.options }}</button>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="233" height="11" viewBox="0 0 233 11" fill="none"><path opacity="0.16" d="M0.166667 5.5C0.166667 8.44552 2.55448 10.8333 5.5 10.8333C8.44552 10.8333 10.8333 8.44552 10.8333 5.5C10.8333 2.55448 8.44552 0.166667 5.5 0.166667C2.55448 0.166667 0.166667 2.55448 0.166667 5.5ZM5.5 6.5H233V4.5H5.5V6.5Z" fill="url(#paint0_linear_63_3281)"/><defs><linearGradient id="paint0_linear_63_3281" x1="5.5" y1="6" x2="233" y2="6" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#999999" stop-opacity="0"/></linearGradient></defs></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col self-end gap-3 justify-start">
+            <svg id="arrow" class="absolute -ml-10 transition-all duration-200" width="27" height="30" viewBox="0 0 27 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path id="Polygon 2" d="M25.3521 12.3853C27.3909 13.5323 27.3909 16.4677 25.3521 17.6147L5.22087 28.9394C3.22106 30.0644 0.749999 28.6193 0.749999 26.3247L0.75 3.67527C0.75 1.38074 3.22106 -0.0643966 5.22088 1.06059L25.3521 12.3853Z" fill="white"/>
+            </svg>
+            <p v-for="action in actionsList" 
+               class="quest-text" 
+               :class="{ 'disabled': !canClick || isTyping }"
+               onmouseover="mouseDown(event)" 
+               @click="actionClick(action)"
+               :style="{ opacity: (!canClick || isTyping) ? '0.5' : '1', 'pointer-events': (!canClick || isTyping) ? 'none' : 'auto' }">
+                {{ action.text }}
+            </p>
+        </div>
+    </div>
+</body>
+</html>
