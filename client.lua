@@ -158,8 +158,8 @@ RegisterNUICallback('action', function(data, cb)
         if data.action.args then
             TriggerEvent(data.action.event, table.unpack(data.action.args))
         end
-        Citizen.Wait(1000)
-        
+        Citizen.Wait(1000) 
+         
         SendNUIMessage({
             action = "setFollowUpOptions",
             options = data.action.followUp

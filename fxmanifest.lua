@@ -6,7 +6,7 @@ author 'jadgal'
 description 'ataTalkToNpc'
 
 ui_page 'html/index.html'
-
+ 
 files {
     'html/**/*',
 }
