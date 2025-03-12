@@ -175,11 +175,7 @@ RegisterNUICallback('action', function(data, cb)
             -- Handle events with arguments
             if data.action.args then
                 -- Special handling for ata_talktonpc events
-                if string.find(data.action.event, "ata_talktonpc") then
-                    TriggerServerEvent(data.action.event, table.unpack(data.action.args))
-                else
-                    TriggerServerEvent(data.action.event)
-                end
+                    TriggerServerEvent(data.action.event, data.action.args)
             else
                 TriggerServerEvent(data.action.event)
             end
@@ -193,12 +189,7 @@ RegisterNUICallback('action', function(data, cb)
 
             -- Handle events with arguments
             if data.action.args then
-                -- Special handling for ata_talktonpc events
-                if string.find(data.action.event, "ata_talktonpc") then
-                    TriggerEvent(data.action.event, table.unpack(data.action.args))
-                else
-                    TriggerEvent(data.action.event)
-                end
+                TriggerEvent(data.action.event, data.action.args)
             else
                 TriggerEvent(data.action.event)
             end
@@ -349,6 +340,7 @@ end)
 
 RegisterNetEvent('ataTalkToNpc:notification')
 AddEventHandler('ataTalkToNpc:notification', function(actions)
+   print(json.encode(actions.args)) 
 	SendNUIMessage({
 		action = "notification",
 		title = actions.title,
@@ -398,8 +390,8 @@ AddEventHandler('ata_talktonpc:sellItems', function ()
 end)
 
 RegisterNetEvent('ataTalkToNpc:example')
-AddEventHandler('ataTalkToNpc:example', function(data)
-    TriggerEvent('ataTalkToNpc:addChat', "text", 'success Notify Test')
+AddEventHandler('ataTalkToNpc:example', function()
+    TriggerEvent('ata_talktonpc:addChat', "text", 'success Notify Test')
 end)
 
 

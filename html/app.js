@@ -88,6 +88,12 @@ var app = new Vue({
         this.handleAction(action);
       };
     },
+    closeUI: function () {
+      return (action) => {
+        $.post(`https://${GetParentResourceName()}/closeUI`);
+        app.display = false;
+      };
+    },
     buyCash: function () {
       return () => {
         if (app.addedItems.length > 0) {

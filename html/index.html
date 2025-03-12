@@ -191,6 +191,14 @@
                :style="{ opacity: (!canClick || isTyping) ? '0.5' : '1', 'pointer-events': (!canClick || isTyping) ? 'none' : 'auto' }">
                 {{ action.text }}
             </p>
+            <p
+               class="quest-text" 
+               :class="{ 'disabled': !canClick || isTyping }"
+               onmouseover="mouseDown(event)" 
+               @click="closeUI()"
+               :style="{ opacity: (!canClick || isTyping) ? '0.5' : '1', 'pointer-events': (!canClick || isTyping) ? 'none' : 'auto' }">
+                Nothing Bye!
+            </p>
         </div>
     </div>
 </body>
