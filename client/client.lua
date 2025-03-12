@@ -61,12 +61,12 @@ local function HandleNPCInteraction(v)
     end
     
     Citizen.Wait(500)
-    TriggerEvent('ataTalkToNpc:checkInventory')
+    TriggerEvent('ata_talktonpc:checkInventory')
     SetNuiFocus(true, true)
     SendNUIMessage({
         action = 'openUI',
         name = v.name,
-        dialog = v.dialog,
+        dialog = v.StartDialog,
         options = v.options,
         SellItem = v.SellItem,
         BuyItem = v.BuyItem,
@@ -87,7 +87,7 @@ Citizen.CreateThread(function()
                 v.coordinates,
                 v.heading,  -- heading 
                 v.textUI, -- interaction text
-                'ataTalkToNpc:interact', -- event name to trigger
+                'ata_talktonpc:interact', -- event name to trigger
                 v,
                 'client', -- event type
                 'strip_club', -- animation type 
@@ -118,7 +118,7 @@ Citizen.CreateThread(function()
                 v.coordinates,
                 v.heading,  -- heading
                 v.textUI, -- interaction text
-                'ataTalkToNpc:interact', -- event name to trigger
+                'ata_talktonpc:interact', -- event name to trigger
                 v,
                 'client', -- event type
                 'strip_club', -- animation type
@@ -165,17 +165,41 @@ RegisterNUICallback('action', function(data, cb)
             options = data.action.followUp
         })
     else
+        -- Handle server-side events
         if data.action.serverSide then
+            -- Close UI if specified before triggering event
+            if data.action.onClose then
+                TriggerEvent('ata_talktonpc:closeUI')
+            end
+
+            -- Handle events with arguments
             if data.action.args then
-                TriggerServerEvent(data.action.event, table.unpack(data.action.args))
+                -- Special handling for ata_talktonpc events
+                if string.find(data.action.event, "ata_talktonpc") then
+                    TriggerServerEvent(data.action.event, table.unpack(data.action.args))
+                else
+                    TriggerServerEvent(data.action.event)
+                end
             else
                 TriggerServerEvent(data.action.event)
             end
-        else
-            if data.action.args then
-                TriggerEvent(data.action.event, table.unpack(data.action.args))
-            else
 
+        -- Handle client-side events
+        else
+            -- Close UI if specified before triggering event  
+            if data.action.onClose then
+                TriggerEvent('ata_talktonpc:closeUI')
+            end
+
+            -- Handle events with arguments
+            if data.action.args then
+                -- Special handling for ata_talktonpc events
+                if string.find(data.action.event, "ata_talktonpc") then
+                    TriggerEvent(data.action.event, table.unpack(data.action.args))
+                else
+                    TriggerEvent(data.action.event)
+                end
+            else
                 TriggerEvent(data.action.event)
             end
         end
@@ -289,8 +313,8 @@ end
 
 
 
-RegisterNetEvent('ataTalkToNpc:addChat')
-AddEventHandler('ataTalkToNpc:addChat', function (atype, data)
+RegisterNetEvent('ata_talktonpc:addChat')
+AddEventHandler('ata_talktonpc:addChat', function (atype, data)
 
 	if atype == "buy" then
 		SendNUIMessage({
@@ -314,16 +338,16 @@ AddEventHandler('ataTalkToNpc:addChat', function (atype, data)
 end)
 
 
-RegisterNetEvent('ataTalkToNpc:setInventoryItems')
-AddEventHandler('ataTalkToNpc:setInventoryItems', function(inventory)
+RegisterNetEvent('ata_talktonpc:setInventoryItems')
+AddEventHandler('ata_talktonpc:setInventoryItems', function(inventory)
 	SendNUIMessage({
 		action = "setInventoryItems",
 		items = inventory,
 	})
 end)
 
-RegisterNetEvent('ataTalkToNpc:notification')
-AddEventHandler('ataTalkToNpc:notification', function(actions)
+RegisterNetEvent('ata_talktonpc:notification')
+AddEventHandler('ata_talktonpc:notification', function(actions)
 	SendNUIMessage({
 		action = "notification",
 		title = actions.title,
@@ -335,53 +359,53 @@ AddEventHandler('ataTalkToNpc:notification', function(actions)
 	})
 end)
 
-RegisterNetEvent('ataTalkToNpc:successItems')
-AddEventHandler('ataTalkToNpc:successItems', function (data)
+RegisterNetEvent('ata_talktonpc:successItems')
+AddEventHandler('ata_talktonpc:successItems', function (data)
 	SendNUIMessage({
 		action = "successItems"
 	})
     Citizen.Wait(1000)
-    TriggerEvent('ataTalkToNpc:closeUI')
+    TriggerEvent('ata_talktonpc:closeUI')
 end)
 
-RegisterNetEvent('ataTalkToNpc:deleteItems')
-AddEventHandler('ataTalkToNpc:deleteItems', function (price)
+RegisterNetEvent('ata_talktonpc:deleteItems')
+AddEventHandler('ata_talktonpc:deleteItems', function (price)
 	SendNUIMessage({
 		action = "deleteItems",
 		price = price
 	})
 	Citizen.Wait(1000)
-    TriggerEvent('ataTalkToNpc:closeUI')
+    TriggerEvent('ata_talktonpc:closeUI')
 end)
 
-RegisterNetEvent('ataTalkToNpc:closeUI')
-AddEventHandler('ataTalkToNpc:closeUI', function ()
+RegisterNetEvent('ata_talktonpc:closeUI')
+AddEventHandler('ata_talktonpc:closeUI', function ()
     SendNUIMessage({action = "closeUI"})
 	SetNuiFocus(false, false)
 	EndCam()
 end)
 
 
-RegisterNetEvent('ataTalkToNpc:buyItems')
-AddEventHandler('ataTalkToNpc:buyItems', function ()
-    TriggerEvent("ataTalkToNpc:addChat", "buy")
+RegisterNetEvent('ata_talktonpc:buyItems')
+AddEventHandler('ata_talktonpc:buyItems', function ()
+    TriggerEvent("ata_talktonpc:addChat", "buy")
 end)
 
 
-RegisterNetEvent('ataTalkToNpc:sellItems')
-AddEventHandler('ataTalkToNpc:sellItems', function ()
-    TriggerEvent("ataTalkToNpc:addChat", "sell")
+RegisterNetEvent('ata_talktonpc:sellItems')
+AddEventHandler('ata_talktonpc:sellItems', function ()
+    TriggerEvent("ata_talktonpc:addChat", "sell")
 end)
 
 
-RegisterNetEvent('ataTalkToNpc:checkInventory')
-AddEventHandler('ataTalkToNpc:checkInventory', function()
+RegisterNetEvent('ata_talktonpc:checkInventory')
+AddEventHandler('ata_talktonpc:checkInventory', function()
     TriggerServerEvent('getInventoryItems')
 end)
 
-RegisterNetEvent('ataTalkToNpc:interact')
-AddEventHandler('ataTalkToNpc:interact', function(data)
-    exports['ata_core']:CallBackServer('ataTalkToNpc:GetJobsCanUse', function(CanUse)
+RegisterNetEvent('ata_talktonpc:interact')
+AddEventHandler('ata_talktonpc:interact', function(data)
+    exports['ata_core']:CallBackServer('ata_talktonpc:GetJobsCanUse', function(CanUse)
         if CanUse then
             if data then
                 HandleNPCInteraction(data)
@@ -390,31 +414,4 @@ AddEventHandler('ataTalkToNpc:interact', function(data)
             exports['ata_core']:Notification(Locales['en']['no_permission'], 'error')
         end
     end, data.jobs)
-end)
-
--- Exports
-exports('addChat', function(type, message)
-    TriggerEvent('ataTalkToNpc:addChat', type, message)
-end)
-
-exports('showNotification', function(data)
-    TriggerEvent('ataTalkToNpc:notification', data)
-end)
-
-exports('openBuyMenu', function()
-    TriggerEvent('ataTalkToNpc:buyItems')
-end)
-
-exports('openSellMenu', function()
-    TriggerEvent('ataTalkToNpc:sellItems')
-end)
-
-exports('closeUI', function()
-    TriggerEvent('ataTalkToNpc:closeUI')
-end)
-
-exports('interactWithNPC', function(npcData)
-    if npcData then
-        HandleNPCInteraction(npcData)
-    end
 end)

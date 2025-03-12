@@ -32,7 +32,7 @@ AddEventHandler('buyitemsCash', function(items)
 
     if success then
         exports['ata_core']:RemoveMoney(source, totalPrice, "cash")
-        TriggerClientEvent('ataTalkToNpc:successItems', source)
+        TriggerClientEvent('ata_talktonpc:successItems', source)
     else
         -- Rollback added items if something failed
         for _, item in ipairs(addedItems) do
@@ -74,7 +74,7 @@ AddEventHandler('buyitemsBank', function(items)
 
     if success then
         exports['ata_core']:RemoveMoney(source, totalPrice, "bank")
-        TriggerClientEvent('ataTalkToNpc:successItems', source)
+        TriggerClientEvent('ata_talktonpc:successItems', source)
     else
         -- Rollback added items if something failed
         for _, item in ipairs(addedItems) do
@@ -119,7 +119,7 @@ AddEventHandler('sellitemsCash', function(items)
     end
 
     exports['ata_core']:AddMoney(source, totalPrice, "cash")
-    TriggerClientEvent('ataTalkToNpc:deleteItems', source, totalPrice)
+    TriggerClientEvent('ata_talktonpc:deleteItems', source, totalPrice)
     exports['ata_core']:Notification(source, Locales['en']['items_sold_successfully'] .. totalPrice, 'success')
 end)
 
@@ -158,18 +158,18 @@ AddEventHandler('sellitemsBank', function(items)
     end
 
     exports['ata_core']:AddMoney(source, totalPrice, "bank")
-    TriggerClientEvent('ataTalkToNpc:deleteItems', source, totalPrice)
+    TriggerClientEvent('ata_talktonpc:deleteItems', source, totalPrice)
     exports['ata_core']:Notification(source, Locales['en']['items_sold_successfully'] .. totalPrice, 'success')
 end)
 
 RegisterNetEvent('getInventoryItems') 
 AddEventHandler('getInventoryItems', function()
     local inventory = exports['ata_core']:GetPlayerInventory(source)
-    TriggerClientEvent('ataTalkToNpc:setInventoryItems', source, inventory)
+    TriggerClientEvent('ata_talktonpc:setInventoryItems', source, inventory)
 end)
 
 
-exports['ata_core']:CreateCallback('ataTalkToNpc:GetJobsCanUse', function(source, cb, jobs)
+exports['ata_core']:CreateCallback('ata_talktonpc:GetJobsCanUse', function(source, cb, jobs)
     if not jobs or #jobs == 0 then
         cb(true)
         return
