@@ -68,25 +68,16 @@ Config.TalkToNPC = {
             }
 		},
 		SellItem = { -- if you using ata_talktonpc:sellItems you need to add items here
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
+			{label = "Bread", name = "bread", price = 100},
+			{label = "Water", name = "water", price = 100},
 		},
         BuyItem = { -- if you using ata_talktonpc:buyItems you need to add items here
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
-			{label = "Weapon Pistol", name = "weapon_pistol", price = 100},
+			{label = "Pistol", name = "weapon_pistol", price = 100},
+			{label = "Assault Rifle", name = "weapon_assaultrifle", price = 100},
 		},
 
 		jobs = {},
 	},
-
 		{
 		npc = 'a_m_m_salton_03',
 		name = 'Pacific Bank',	
