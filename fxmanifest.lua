@@ -2,28 +2,39 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-author 'jadgal'
-description 'ataTalkToNpc'
+name 'ata_TalkToNPC'
+author 'By ATA.TEBEX.IO'
+description 'resource for NPC interactions and dialogues'
+version '1.0.0'
 
 ui_page 'html/index.html'
- 
+
 files {
-    'html/**/*',
+    'html/index.html',
+    'html/*.css',
+    'html/*.js',
+    'html/images/*.png',
+    'html/fonts/*.ttf'
 }
 
 shared_scripts {
-    "shared/*.lua",
-    "locale.lua",
+    'config.lua',
+    'locale.lua'
 }
 
 client_scripts {
-    'client.lua',
+    'client/client.lua'
 }
 
 server_scripts {
-    'server.lua',
+    'server/server.lua'
 }
 
 dependencies {
-    'ata_core',
+    'ata_core'
+}
+
+escrow_ignore {
+    'config.lua',
+    'locale.lua'
 }
