@@ -346,16 +346,16 @@ AddEventHandler('ata_talktonpc:setInventoryItems', function(inventory)
 	})
 end)
 
-RegisterNetEvent('ata_talktonpc:notification')
-AddEventHandler('ata_talktonpc:notification', function(actions)
+
+RegisterNetEvent('ataTalkToNpc:notification')
+AddEventHandler('ataTalkToNpc:notification', function(actions)
 	SendNUIMessage({
 		action = "notification",
 		title = actions.title,
 		message = actions.message,
 		options = actions.options,
 		icon = actions.icon,
-		event = actions.event,
-		serverSide = actions.serverSide,
+        Clickevent = actions.Clickevent,
 	})
 end)
 
@@ -395,6 +395,11 @@ end)
 RegisterNetEvent('ata_talktonpc:sellItems')
 AddEventHandler('ata_talktonpc:sellItems', function ()
     TriggerEvent("ata_talktonpc:addChat", "sell")
+end)
+
+RegisterNetEvent('ataTalkToNpc:example')
+AddEventHandler('ataTalkToNpc:example', function(data)
+    TriggerEvent('ataTalkToNpc:addChat', "text", 'success Notify Test')
 end)
 
 

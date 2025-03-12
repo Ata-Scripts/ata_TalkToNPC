@@ -139,16 +139,11 @@ var app = new Vue({
       return this.addedItems.find((item) => item.name === name);
     },
     handleNotificationClick: function (event) {
-      console.log(event);
-
-      $.post(
-        `https://${GetParentResourceName()}/action`,
-        JSON.stringify({
-          action: {
+      $.post(`https://${GetParentResourceName()}/action`, JSON.stringify({
+        action: {
             event: event,
-            serverSide: false,
-          },
-        })
+        }
+    })
       );
     },
     handleAction(action) {
@@ -278,17 +273,15 @@ function addChat(data) {
   } else if (data.type === "notification") {
     app.chatHistory.push({
       type: "notification",
-      data: [
-        {
-          title: data.title,
-          message: data.message,
-          options: data.options,
-          event: data.event,
-          icon: data.icon,
-          serverSide: data.serverSide,
-        },
-      ],
-    });
+      data: [{
+          title: data.data[0].title,
+          message: data.data[0].message,
+          options: data.data[0].options,
+          Clickevent: data.data[0].Clickevent,
+          icon: data.data[0].icon,
+          serverSide: data.data[0].serverSide
+      }]
+  });
   } else {
     app.chatHistory.push(data);
   }
@@ -385,21 +378,17 @@ window.addEventListener("message", (event) => {
       }, 200);
       break;
     case "notification":
-      console.log(event.data);
-
       addChat({
         type: "notification",
-        data: [
-          {
+        data: [{
             title: event.data.title,
             message: event.data.message,
             options: event.data.options,
-            event: event.data.event,
+            Clickevent: event.data.Clickevent,
             icon: event.data.icon,
-            serverSide: false,
-          },
-        ],
-      });
+            serverSide: false
+        }]
+    });
       break;
     case "successItems":
       let removedItems = app.addedItems;

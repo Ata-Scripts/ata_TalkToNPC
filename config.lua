@@ -24,7 +24,8 @@ Config.TalkToNPC = {
 		heading = 160.0,						
 		options = {			
 			{text = "I want to buy some of items from you", event = "ata_talktonpc:buyItems", serverSide = false},										
-			{text = "sell Items", event = "ata_talktonpc:sellItems", serverSide = false},									
+			{text = "sell Items", event = "ata_talktonpc:sellItems", serverSide = false},	
+			{text = "notification", serverSide = false, event = "ataTalkToNpc:notification", args = {title = "notification", message = "Would you like to proceed with opening a new account?", options = "Open Account", icon = "fas fa-university", Clickevent = "ataTalkToNpc:example"}},
 			{
                 text = "Tell me about your banking services",
                 event = "ata_talktonpc:addChat",
