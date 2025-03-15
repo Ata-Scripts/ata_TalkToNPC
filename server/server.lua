@@ -63,6 +63,7 @@ AddEventHandler('buyitemsBank', function(items)
     local addedItems = {}
     
     for _, item in ipairs(items) do
+        print(item.name)
         local addItem = exports['ata_core']:AddItem(source, item.name, item.count)
         if addItem then
             table.insert(addedItems, {name = item.name, count = item.count, price = item.price})
@@ -189,4 +190,10 @@ exports['ata_core']:CreateCallback('ata_talktonpc:GetJobsCanUse', function(sourc
     end
 
     cb(false)
+end)
+
+
+CreateThread(function()
+    Wait(10000)
+    exports['ata_core']:VersionCheck('ata_talktonpc')
 end)

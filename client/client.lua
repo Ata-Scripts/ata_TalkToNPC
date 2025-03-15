@@ -4,7 +4,7 @@ local pedList = {}
 local cam = nil
 
 
-
+DoScreenFadeIn(100)
 -- Function to handle NPC interaction
 local function HandleNPCInteraction(v)
 
@@ -73,6 +73,7 @@ local function HandleNPCInteraction(v)
         config = Config
     })
 end
+
 
 -- CREATE NPCs
 Citizen.CreateThread(function()
@@ -338,8 +339,8 @@ AddEventHandler('ata_talktonpc:setInventoryItems', function(inventory)
 end)
 
 
-RegisterNetEvent('ataTalkToNpc:notification')
-AddEventHandler('ataTalkToNpc:notification', function(actions)
+RegisterNetEvent('ata_talktonpc:notification')
+AddEventHandler('ata_talktonpc:notification', function(actions)
    print(json.encode(actions.args)) 
 	SendNUIMessage({
 		action = "notification",
@@ -389,11 +390,6 @@ AddEventHandler('ata_talktonpc:sellItems', function ()
     TriggerEvent("ata_talktonpc:addChat", "sell")
 end)
 
-RegisterNetEvent('ataTalkToNpc:example')
-AddEventHandler('ataTalkToNpc:example', function()
-    TriggerEvent('ata_talktonpc:addChat', "text", 'success Notify Test')
-end)
-
 
 RegisterNetEvent('ata_talktonpc:checkInventory')
 AddEventHandler('ata_talktonpc:checkInventory', function()
@@ -402,7 +398,7 @@ end)
 
 RegisterNetEvent('ata_talktonpc:interact')
 AddEventHandler('ata_talktonpc:interact', function(data)
-    exports['ata_core']:CallBackServer('ata_talktonpc:GetJobsCanUse', function(CanUse)
+    exports['ata_core']:ServerCallback('ata_talktonpc:GetJobsCanUse', function(CanUse)
         if CanUse then
             if data then
                 HandleNPCInteraction(data)
